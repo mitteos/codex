@@ -1,0 +1,52 @@
+*,
+::after,
+::before {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+ol[class],
+ul[class] {
+  padding: 0;
+}
+blockquote,
+body,
+dd,
+dl,
+figcaption,
+figure,
+h1,
+h2,
+h3,
+h4,
+li,
+ol,
+p,
+ul {
+  margin: 0;
+}
+ol[class],
+ul[class] {
+  list-style: none;
+}
+a,
+a:not([class]) {
+  text-decoration-skip-ink: auto;
+  text-decoration: none;
+}
+img {
+  display: block;
+}
+article > * + * {
+  margin-top: 1em;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+body {
+  min-height: 100vh;
+  text-rendering: optimizeSpeed;
+  position: relative;
+}

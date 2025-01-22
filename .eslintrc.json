@@ -1,0 +1,56 @@
+{
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "plugin:@typescript-eslint/recommended",
+      "prettier"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaFeatures": {
+        "jsx": true
+      },
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "plugins": ["react", "react-hooks", "react-refresh", "@typescript-eslint", "prettier"],
+    "rules": {
+      "@typescript-eslint/semi": "off",
+      "semi": "off",
+      "react/react-in-jsx-scope": "off",
+      "no-duplicate-imports": "warn",
+      "no-self-compare": "warn",
+      "no-use-before-define": "warn",
+      "default-case-last": "warn",
+      "no-console": "warn",
+      "no-else-return": "warn",
+      "no-empty": "warn",
+      "no-empty-function": "warn",
+      "no-inline-comments": "warn",
+      "no-lonely-if": "warn",
+      "no-undef": "off",
+      "react/prop-types": "off",
+      "react-refresh/only-export-components": [
+        "warn",
+        { "allowConstantExport": true }
+      ],
+      "@typescript-eslint/ban-types": [
+        "error",
+        {
+          "types": {
+            "String": false,
+            "Boolean": false,
+            "Number": false,
+            "Symbol": false,
+            "{}": false,
+            "Object": false,
+            "object": false,
+            "Function": false
+          },
+          "extendDefaults": true
+        }
+      ],
+      "prefer-const": "off",
+      "prettier/prettier": ["warn", { "endOfLine": "auto" }]
+    }
+  }
