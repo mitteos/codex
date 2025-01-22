@@ -1,15 +1,28 @@
+import { Bounce, toast, ToastContainer } from 'react-toastify'
 import styles from './Navbar.module.scss'
+import { Link } from 'react-router-dom'
 
 export const Navbar = () => {
   const handleCopy = () => {
     navigator.clipboard.writeText('https://playground.com/aeAWfaWFA2FQA2')
+    toast('Link copied to clipboard', {
+      position: 'bottom-center',
+      autoClose: 1500,
+      hideProgressBar: true,
+      closeOnClick: false,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: 'dark',
+      transition: Bounce
+    })
   }
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <div className={styles.logo}>
-          <p>Playground</p>
-        </div>
+        <Link to="/" className={styles.logo}>
+          <img className={styles.logoImage} src="/logo.png" alt="codeX" />
+        </Link>
         <div className={styles.controls}>
           <div className={styles.link}>
             <input
@@ -36,6 +49,7 @@ export const Navbar = () => {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   )
 }

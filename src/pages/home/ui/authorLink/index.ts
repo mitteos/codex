@@ -1,1 +1,0 @@
-export { AuthorLink } from './authorLink'
