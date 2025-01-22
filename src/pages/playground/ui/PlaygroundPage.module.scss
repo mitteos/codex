@@ -6,9 +6,12 @@
   user-select: none;
 }
 
-.editor {
+.input {
   width: 70%;
   overflow: hidden;
-  padding: 20px;
   min-width: 300px;
+}
+
+.editor {
+  padding: 20px;
 }

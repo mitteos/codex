@@ -2,6 +2,7 @@ import { Editor } from '@monaco-editor/react'
 import styles from './PlaygroundPage.module.scss'
 import { useRef, useState } from 'react'
 import { OutputBlock } from './OutputBlock/OutputBlock'
+import { Navbar } from './Navbar/Navbar'
 
 export const PlaygroundPage = () => {
   const [code, setCode] = useState('')
@@ -33,8 +34,10 @@ export const PlaygroundPage = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.editor} ref={editorRef}>
+      <div className={styles.input} ref={editorRef}>
+        <Navbar />
         <Editor
+          className={styles.editor}
           height="100vh"
           defaultLanguage="javascript"
           defaultValue="// Примеры использования консоли:
