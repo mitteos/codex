@@ -7,7 +7,7 @@ export const AppRouter = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/playground" element={<PlaygroundPage />} />
+        <Route path="/playground/:id" element={<PlaygroundPage />} />
       </Routes>
     </BrowserRouter>
   )

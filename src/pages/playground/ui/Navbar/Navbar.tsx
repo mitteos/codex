@@ -1,10 +1,14 @@
 import { Bounce, toast, ToastContainer } from 'react-toastify'
 import styles from './Navbar.module.scss'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { useState } from 'react'
 
 export const Navbar = () => {
+  const location = useLocation()
+  const fullUrl = `${window.location.origin}${location.pathname}${location.search}${location.hash}`
+  const [link] = useState(fullUrl)
   const handleCopy = () => {
-    navigator.clipboard.writeText('https://playground.com/aeAWfaWFA2FQA2')
+    navigator.clipboard.writeText(fullUrl)
     toast('Link copied to clipboard', {
       position: 'bottom-center',
       autoClose: 1500,
@@ -28,7 +32,8 @@ export const Navbar = () => {
             <input
               className={styles.linkInput}
               type="text"
-              value="https://playground.com/aeAWfaWFA2FQA2"
+              value={link}
+              onChange={() => {}}
             />
             <button className={styles.linkButton} onClick={handleCopy}>
               <svg

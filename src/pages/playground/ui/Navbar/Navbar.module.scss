@@ -26,12 +26,16 @@
   width: 100%;
 }
 .link {
-  padding: 5px 10px;
-  border-radius: 5px;
+  padding: 3px 10px;
+  border-radius: 8px;
   min-width: 100px;
-  border: 1px solid #fff;
+  border: 1px solid #bbbbbb;
   display: flex;
   align-items: center;
+  transition: all 0.3s ease;
+}
+.link:hover {
+  border: 1px solid #fff;
 }
 .linkInput {
   width: 100%;
@@ -60,8 +64,8 @@
   gap: 5px;
 }
 .userItem {
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   background: #fff;
   color: #fff;
@@ -69,6 +73,7 @@
   align-items: center;
   font-size: 14px;
   justify-content: center;
+  font-weight: 600;
 }
 .userItem:first-child {
   background: #f73939;

@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import styles from './HomePage.module.scss'
+import uuid from 'react-uuid'
 
 export const HomePage = () => {
   const navigate = useNavigate()
   const handleLinkClick = () => {
-    navigate('/playground')
+    const roomId = uuid()
+    navigate(`/playground/${roomId}`)
   }
   return (
     <div className={styles.container}>
