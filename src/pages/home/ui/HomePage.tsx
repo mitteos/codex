@@ -3,6 +3,7 @@ import styles from './HomePage.module.scss'
 import uuid from 'react-uuid'
 import { useEffect } from 'react'
 import useSocketStore from '@/shared/store/useSocketStore'
+import { LinkButton } from './LinkButton/LinkButton'
 
 export const HomePage = () => {
   const navigate = useNavigate()
@@ -22,16 +23,7 @@ export const HomePage = () => {
   return (
     <div className={styles.container}>
       <img className={styles.logo} src="/logo.png" alt="codeX" />
-      <div className={styles.buttons}>
-        <button className={styles.btn} onClick={handleLinkClick}>
-          <span></span>
-          <p
-            data-start="good luck!"
-            data-text="Playground"
-            data-title="Start"
-          ></p>
-        </button>
-      </div>
+      <LinkButton onClick={handleLinkClick} />
     </div>
   )
 }
