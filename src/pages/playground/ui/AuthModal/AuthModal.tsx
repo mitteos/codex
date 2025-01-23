@@ -1,4 +1,4 @@
-import useUserStore from '@/shared/store/userStore'
+import useUserStore from '@/shared/store/useUserStore'
 import styles from './AuthModal.module.scss'
 import cn from 'classnames'
 import { useState } from 'react'

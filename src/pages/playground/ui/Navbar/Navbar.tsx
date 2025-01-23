@@ -2,8 +2,13 @@ import { Bounce, toast, ToastContainer } from 'react-toastify'
 import styles from './Navbar.module.scss'
 import { Link, useLocation } from 'react-router-dom'
 import { useState } from 'react'
+import { USER_COLORS } from '@/shared/constants/colors/userColors'
 
-export const Navbar = () => {
+interface NavbarProps {
+  usersList: string[]
+}
+
+export const Navbar = ({ usersList }: NavbarProps) => {
   const location = useLocation()
   const fullUrl = `${window.location.origin}${location.pathname}${location.search}${location.hash}`
   const [link] = useState(fullUrl)
@@ -49,8 +54,15 @@ export const Navbar = () => {
             </button>
           </div>
           <div className={styles.user}>
-            <p className={styles.userItem}>A</p>
-            <p className={styles.userItem}>D</p>
+            {usersList.map((user, index) => (
+              <p
+                key={index}
+                className={styles.userItem}
+                style={{ background: USER_COLORS[index] }}
+              >
+                {user.slice(0, 1)}
+              </p>
+            ))}
           </div>
         </div>
       </div>

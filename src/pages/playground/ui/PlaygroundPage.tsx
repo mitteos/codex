@@ -3,11 +3,12 @@ import styles from './PlaygroundPage.module.scss'
 import { useEffect, useRef, useState } from 'react'
 import { OutputBlock } from './OutputBlock/OutputBlock'
 import { Navbar } from './Navbar/Navbar'
-import useUserStore from '@/shared/store/userStore'
+import useUserStore from '@/shared/store/useUserStore'
 import { Bounce, toast, ToastContainer } from 'react-toastify'
 import { useParams } from 'react-router-dom'
 import { AuthModal } from './AuthModal/AuthModal'
 import { useDebounce } from '@/shared/helpers/useDebounce'
+import useSocketStore from '@/shared/store/useSocketStore'
 
 export const PlaygroundPage = () => {
   const [code, setCode] = useState('')
@@ -15,12 +16,16 @@ export const PlaygroundPage = () => {
   const outputRef = useRef<HTMLDivElement>(null)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const { name } = useUserStore()
+  const { setSocket } = useSocketStore()
+  const [usersList, setUsersList] = useState([])
   const { id: roomId } = useParams()
 
   const socket = useRef<WebSocket | null>(null)
   const initializeSocket = () => {
     socket.current = new WebSocket('wss://codex-server-1yeq.onrender.com')
-
+    if (socket.current) {
+      setSocket(socket.current)
+    }
     socket.current.onopen = () => {
       console.log('Connected to server')
       const message = {
@@ -51,6 +56,9 @@ export const PlaygroundPage = () => {
             theme: 'dark',
             transition: Bounce
           })
+          break
+        case 'users':
+          setUsersList(message.users)
           break
       }
     }
@@ -108,7 +116,7 @@ export const PlaygroundPage = () => {
   return (
     <div className={styles.container}>
       <div className={styles.input} ref={editorRef}>
-        <Navbar />
+        <Navbar usersList={usersList} />
         <Editor
           className={styles.editor}
           height="100vh"
