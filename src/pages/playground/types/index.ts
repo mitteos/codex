@@ -3,3 +3,9 @@ export type OutputState = {
   type: 'log' | 'error' | 'warn' | 'info'
   component: React.ReactNode
 }
+
+export type UserState = {
+  id: string
+  username: string
+  color: string
+}

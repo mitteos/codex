@@ -2,10 +2,10 @@ import { Bounce, toast, ToastContainer } from 'react-toastify'
 import styles from './Navbar.module.scss'
 import { Link, useLocation } from 'react-router-dom'
 import { useState } from 'react'
-import { USER_COLORS } from '@/shared/constants/colors/userColors'
+import { UserState } from '../../types'
 
 interface NavbarProps {
-  usersList: string[]
+  usersList: UserState[]
 }
 
 export const Navbar = ({ usersList }: NavbarProps) => {
@@ -58,9 +58,9 @@ export const Navbar = ({ usersList }: NavbarProps) => {
               <p
                 key={index}
                 className={styles.userItem}
-                style={{ background: USER_COLORS[index] }}
+                style={{ background: user.color }}
               >
-                {user.slice(0, 1)}
+                {user.username.slice(0, 1)}
               </p>
             ))}
           </div>
