@@ -13,6 +13,7 @@ import * as awarenessProtocol from 'y-protocols/awareness.js'
 import { UserState } from '../types'
 import { setUserColor } from '../helpers/setUserColor'
 import useSocketStore from '@/shared/store/useSocketStore'
+import { USER_COLORS } from '@/shared/constants/colors/userColors'
 
 export const PlaygroundPage = () => {
   const editorBlockRef = useRef<HTMLDivElement>(null)
@@ -75,10 +76,24 @@ export const PlaygroundPage = () => {
       awareness
     )
 
+    const getColor = () => {
+      const usersColors: string[] = []
+
+      awareness.getStates().forEach((state) => {
+        if (state.user?.color) {
+          usersColors.push(state.user.color)
+        }
+      })
+
+      const color = USER_COLORS.filter((color) => !usersColors.includes(color))
+      const randomColor = color[Math.floor(Math.random() * color.length)]
+      return randomColor
+    }
+
     awareness.setLocalStateField('user', {
       userId: name,
       username: name,
-      color: `#${Math.floor(Math.random() * 16777215).toString(16)}`
+      color: getColor()
     })
 
     awareness.on('change', () => {
