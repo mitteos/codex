@@ -68,7 +68,7 @@ export const PlaygroundPage = () => {
 
     const awareness = provider.awareness
 
-    const binding = new MonacoBinding(
+    new MonacoBinding(
       type,
       editorRef.current.getModel(),
       new Set([editorRef.current]),
