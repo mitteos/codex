@@ -13,7 +13,8 @@ import * as awarenessProtocol from 'y-protocols/awareness.js'
 import { UserState } from '../types'
 import { setUserColor } from '../helpers/setUserColor'
 import useSocketStore from '@/shared/store/useSocketStore'
-import { USER_COLORS } from '@/shared/constants/colors/userColors'
+import { useResizablePanels } from '@/shared/helpers/useResizablePanels'
+import { getUserColor } from '../helpers/getUserColor'
 
 export const PlaygroundPage = () => {
   const editorBlockRef = useRef<HTMLDivElement>(null)
@@ -25,6 +26,11 @@ export const PlaygroundPage = () => {
   const [usersList, setUsersList] = useState<UserState[]>([])
   const { id: roomId } = useParams()
 
+  const { startResizing, stopResizing } = useResizablePanels(
+    editorBlockRef,
+    outputRef
+  )
+
   useEffect(() => {
     if (!name) {
       setIsAuthModalOpen(true)
@@ -33,40 +39,18 @@ export const PlaygroundPage = () => {
     setIsAuthModalOpen(false)
   }, [name])
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (editorBlockRef.current && outputRef.current) {
-      document.body.style.cursor = 'col-resize'
-      editorBlockRef.current.style.width = `${(e.clientX / window.innerWidth) * 100}%`
-      outputRef.current.style.width = `${100 - (e.clientX / window.innerWidth) * 100}%`
-    }
-  }
-
-  const startResizing = () => {
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', stopResizing)
-  }
-
-  const stopResizing = () => {
-    document.removeEventListener('mousemove', handleMouseMove)
-    document.removeEventListener('mouseup', stopResizing)
-    document.body.style.cursor = 'auto'
-  }
-
   const handleMount = (editor: any) => {
     editorRef.current = editor
 
     const doc = new Y.Doc()
-
     const provider = new WebsocketProvider(
       `wss://codex-server-yjs.onrender.com/${roomId}`,
       `playground-${roomId}`,
       doc
     )
-
     setSocket(provider)
 
     const type = doc.getText('monaco')
-
     const awareness = provider.awareness
 
     new MonacoBinding(
@@ -76,24 +60,10 @@ export const PlaygroundPage = () => {
       awareness
     )
 
-    const getColor = () => {
-      const usersColors: string[] = []
-
-      awareness.getStates().forEach((state) => {
-        if (state.user?.color) {
-          usersColors.push(state.user.color)
-        }
-      })
-
-      const color = USER_COLORS.filter((color) => !usersColors.includes(color))
-      const randomColor = color[Math.floor(Math.random() * color.length)]
-      return randomColor
-    }
-
     awareness.setLocalStateField('user', {
       userId: name,
       username: name,
-      color: getColor()
+      color: getUserColor(awareness)
     })
 
     awareness.on('change', () => {
