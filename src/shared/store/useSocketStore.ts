@@ -1,9 +1,10 @@
+import { WebsocketProvider } from 'y-websocket'
 import { create, StateCreator } from 'zustand'
 import { createJSONStorage, persist, PersistOptions } from 'zustand/middleware'
 
 interface SocketStore {
-  socket: WebSocket | null
-  setSocket: (socket: WebSocket | null) => void
+  socket: WebsocketProvider | null
+  setSocket: (socket: WebsocketProvider | null) => void
 }
 
 type SocketPersist = (
@@ -15,7 +16,7 @@ const useSocketStore = create<SocketStore>()(
   (persist as SocketPersist)(
     (set) => ({
       socket: null,
-      setSocket: (socket: WebSocket | null) => set({ socket })
+      setSocket: (socket: WebsocketProvider | null) => set({ socket })
     }),
     {
       name: 'socket',

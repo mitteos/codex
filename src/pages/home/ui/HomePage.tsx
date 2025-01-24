@@ -15,7 +15,7 @@ export const HomePage = () => {
 
   useEffect(() => {
     if (socket) {
-      socket.close()
+      socket.disconnect()
       setSocket(null)
     }
   }, [])

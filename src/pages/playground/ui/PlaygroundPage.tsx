@@ -12,6 +12,7 @@ import { WebsocketProvider } from 'y-websocket'
 import * as awarenessProtocol from 'y-protocols/awareness.js'
 import { UserState } from '../types'
 import { setUserColor } from '../helpers/setUserColor'
+import useSocketStore from '@/shared/store/useSocketStore'
 
 export const PlaygroundPage = () => {
   const editorBlockRef = useRef<HTMLDivElement>(null)
@@ -19,6 +20,7 @@ export const PlaygroundPage = () => {
   const outputRef = useRef<HTMLDivElement>(null)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const { name } = useUserStore()
+  const { setSocket } = useSocketStore()
   const [usersList, setUsersList] = useState<UserState[]>([])
   const { id: roomId } = useParams()
 
@@ -55,10 +57,12 @@ export const PlaygroundPage = () => {
     const doc = new Y.Doc()
 
     const provider = new WebsocketProvider(
-      `ws://localhost:1234/${roomId}`,
+      `wss://codex-server-yjs.onrender.com/${roomId}`,
       `playground-${roomId}`,
       doc
     )
+
+    setSocket(provider)
 
     const type = doc.getText('monaco')
 
@@ -80,6 +84,8 @@ export const PlaygroundPage = () => {
     awareness.on('change', () => {
       updateUserList()
     })
+
+    updateUserList()
 
     function updateUserList() {
       const users: any[] = []
