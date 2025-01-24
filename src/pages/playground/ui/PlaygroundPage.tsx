@@ -11,6 +11,7 @@ import { MonacoBinding } from 'y-monaco'
 import { WebsocketProvider } from 'y-websocket'
 import * as awarenessProtocol from 'y-protocols/awareness.js'
 import { UserState } from '../types'
+import { setUserColor } from '../helpers/setUserColor'
 
 export const PlaygroundPage = () => {
   const editorBlockRef = useRef<HTMLDivElement>(null)
@@ -90,30 +91,7 @@ export const PlaygroundPage = () => {
             color: state.user.color
           })
 
-          const styleElement = document.createElement('style')
-          styleElement.innerHTML = `
-            .yRemoteSelection-${clientId} {
-              background-color: ${state.user.color};
-            }
-            .yRemoteSelectionHead {
-              position: absolute;
-              border-left: ${state.user.color} solid 2px;
-              border-top: ${state.user.color} solid 2px;
-              border-bottom: ${state.user.color} solid 2px;
-              height: 100%;
-              box-sizing: border-box;
-            }
-            .yRemoteSelectionHead::after {
-              position: absolute;
-              content: ' ';
-              border: 3px solid ${state.user.color};
-              border-radius: 4px;
-              left: -4px;
-              top: -5px;
-            }
-
-          `
-          document.head.appendChild(styleElement)
+          setUserColor(clientId.toString(), state.user.color)
         }
       })
       setUsersList(users)

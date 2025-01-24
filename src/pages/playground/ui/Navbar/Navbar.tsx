@@ -33,6 +33,25 @@ export const Navbar = ({ usersList }: NavbarProps) => {
           <img className={styles.logoImage} src="/logo.png" alt="codeX" />
         </Link>
         <div className={styles.controls}>
+          <div className={styles.user}>
+            {usersList.map((user, index) => (
+              <div key={index} className={styles.userContainer}>
+                <p
+                  className={styles.userItem}
+                  style={{ background: user.color }}
+                >
+                  {user.username.slice(0, 1)}
+                </p>
+                <div className={styles.userInfo}>
+                  <span
+                    className={styles.userInfoLine}
+                    style={{ backgroundColor: user.color }}
+                  ></span>
+                  <p className={styles.userInfoText}>{user.username}</p>
+                </div>
+              </div>
+            ))}
+          </div>
           <div className={styles.link}>
             <input
               className={styles.linkInput}
@@ -52,17 +71,6 @@ export const Navbar = ({ usersList }: NavbarProps) => {
                 </g>
               </svg>
             </button>
-          </div>
-          <div className={styles.user}>
-            {usersList.map((user, index) => (
-              <p
-                key={index}
-                className={styles.userItem}
-                style={{ background: user.color }}
-              >
-                {user.username.slice(0, 1)}
-              </p>
-            ))}
           </div>
         </div>
       </div>

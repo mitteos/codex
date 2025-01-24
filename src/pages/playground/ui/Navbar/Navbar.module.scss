@@ -61,7 +61,7 @@
 .user {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 3px;
 }
 .userItem {
   width: 35px;
@@ -74,4 +74,42 @@
   font-size: 14px;
   justify-content: center;
   font-weight: 600;
+  cursor: pointer;
+
+  &:hover + .userInfo {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+.userContainer {
+  position: relative;
+}
+.userInfo {
+  position: absolute;
+  height: auto;
+  bottom: -5px;
+  left: 50%;
+  background: rgb(77, 77, 77);
+  padding: 20px 30px;
+  transform: translate(-50%, 100%);
+  z-index: 6;
+  transition: all 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.userInfoLine {
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 3px;
+  border-radius: 10px;
+}
+.userInfoText {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
 }
