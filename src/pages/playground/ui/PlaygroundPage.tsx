@@ -52,13 +52,10 @@ export const PlaygroundPage = () => {
 
     const type = doc.getText('monaco')
     const awareness = provider.awareness
+    const model = editorRef.current.getModel()
+    model.setEOL(editorRef.current.EndOfLineSequence.LF)
 
-    new MonacoBinding(
-      type,
-      editorRef.current.getModel(),
-      new Set([editorRef.current]),
-      awareness
-    )
+    new MonacoBinding(type, model, new Set([editorRef.current]), awareness)
 
     awareness.setLocalStateField('user', {
       userId: name,
