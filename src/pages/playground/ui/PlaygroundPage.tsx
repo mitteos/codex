@@ -53,7 +53,7 @@ export const PlaygroundPage = () => {
     const type = doc.getText('monaco')
     const awareness = provider.awareness
     const model = editorRef.current.getModel()
-    model.setEOL(editorRef.current.EndOfLineSequence.LF)
+    model.setEOL(1)
 
     new MonacoBinding(type, model, new Set([editorRef.current]), awareness)
 
