@@ -3,7 +3,6 @@ import { OutputState } from '../../types'
 import styles from './OutputBlock.module.scss'
 import cn from 'classnames'
 import { useEffect, useRef, useState } from 'react'
-import * as ts from 'typescript'
 
 interface OutputBlockProps {
   outRef: React.RefObject<HTMLDivElement>
@@ -17,131 +16,85 @@ export const OutputBlock: React.FC<OutputBlockProps> = ({
   outRef,
   startResizing,
   stopResizing,
-  code,
-  language
+  code
 }) => {
-  const idCounterRef = useRef(0)
   const [output, setOutput] = useState<OutputState[]>([])
+  const idCounterRef = useRef(0)
 
-  const generateUniqueId = () => {
+  const generateId = () => {
     idCounterRef.current += 1
     return idCounterRef.current
   }
 
-  const executeCode = () => {
+  const safeEval = (code: any) => {
     try {
-      const result = executeWithConsole()
-      setOutput(result)
+      const originalLog = console.log
+      const originalError = console.error
+      const originalWarn = console.warn
+      const originalInfo = console.info
+
+      const logs: OutputState[] = []
+
+      console.log = (...args) =>
+        logs.push({
+          id: generateId(),
+          type: 'log' as const,
+          component: args.map((arg) => JSON.stringify(arg, null, 2)).join(' ')
+        })
+      console.error = (...args) =>
+        logs.push({
+          id: generateId(),
+          type: 'error' as const,
+          component: args.map((arg) => JSON.stringify(arg, null, 2)).join(' ')
+        })
+      console.warn = (...args) =>
+        logs.push({
+          id: generateId(),
+          type: 'warn' as const,
+          component: args.map((arg) => JSON.stringify(arg, null, 2)).join(' ')
+        })
+      console.info = (...args) =>
+        logs.push({
+          id: generateId(),
+          type: 'info' as const,
+          component: args.map((arg) => JSON.stringify(arg, null, 2)).join(' ')
+        })
+      try {
+        eval(code)
+      } catch (e: any) {
+        logs.push({
+          id: generateId(),
+          type: 'error' as const,
+          component: e.message
+        })
+      }
+
+      console.log = originalLog
+      console.error = originalError
+      console.warn = originalWarn
+      console.info = originalInfo
+
+      return logs
     } catch (error: any) {
-      setOutput([
+      return [
         {
-          id: generateUniqueId(),
-          type: 'error',
-          component: <p>Ошибка: {error.message}</p>
+          id: generateId(),
+          type: 'error' as const,
+          component: error.message
         }
-      ])
+      ]
     }
   }
-  const debouncedExecute = useDebounce(executeCode, 1000)
 
-  function executeWithConsole() {
-    const logs: OutputState[] = []
-    const fakeConsole = {
-      log: (...args: any[]) => {
-        const formattedArgs = args.map((arg, index) => {
-          if (typeof arg === 'object') {
-            try {
-              return (
-                <p key={`${generateUniqueId()}-${index}`}>
-                  {JSON.stringify(arg, null, 2)}
-                </p>
-              )
-            } catch {
-              return <p key={`${generateUniqueId()}-${index}`}>{String(arg)}</p>
-            }
-          }
-          if (typeof arg === 'undefined') {
-            return <p key={`${generateUniqueId()}-${index}`}>undefined</p>
-          }
-          if (typeof arg === 'string') {
-            return <p key={`${generateUniqueId()}-${index}`}>{arg}</p>
-          }
-          return <p key={`${generateUniqueId()}-${index}`}>{String(arg)}</p>
-        })
-        logs.push({
-          id: generateUniqueId(),
-          type: 'log',
-          component: formattedArgs
-        })
-      },
-      error: (...args: any[]) => {
-        const errorMessage = args.map((arg) => String(arg)).join(' ')
-        logs.push({
-          id: generateUniqueId(),
-          type: 'error',
-          component: <p key={generateUniqueId()}>🚫 Ошибка: {errorMessage}</p>
-        })
-      },
-      warn: (...args: any[]) => {
-        const warnMessage = args.map((arg) => String(arg)).join(' ')
-        logs.push({
-          id: generateUniqueId(),
-          type: 'warn',
-          component: <p key={generateUniqueId()}>⚠️ Warning: {warnMessage}</p>
-        })
-      },
-      info: (...args: any[]) => {
-        const infoMessage = args.map((arg) => String(arg)).join(' ')
-        logs.push({
-          id: generateUniqueId(),
-          type: 'info',
-          component: <p key={generateUniqueId()}>ℹ️ {infoMessage}</p>
-        })
-      }
-    }
-
-    try {
-      let jsCode = code
-
-      if (language === 'typescript') {
-        try {
-          jsCode = ts.transpileModule(code, {
-            compilerOptions: {
-              target: ts.ScriptTarget.ES2015,
-              module: ts.ModuleKind.None
-            }
-          }).outputText
-        } catch (transpileError: any) {
-          logs.push({
-            id: generateUniqueId(),
-            type: 'error',
-            component: (
-              <p key={generateUniqueId()}>
-                🚫 TypeScript Error: {transpileError.message}
-              </p>
-            )
-          })
-          return logs
-        }
-      }
-
-      const func = new Function('console', jsCode)
-      func(fakeConsole)
-    } catch (err: any) {
-      logs.push({
-        id: generateUniqueId(),
-        type: 'error',
-        component: (
-          <p key={generateUniqueId()}>🚫 Runtime error: {err.message}</p>
-        )
-      })
-    }
-
-    return logs
+  const handleRunCode = () => {
+    const logs = safeEval(code)
+    setOutput(logs)
   }
+
+  const debouncedHandleRunCode = useDebounce(handleRunCode, 1000)
 
   useEffect(() => {
-    debouncedExecute()
+    debouncedHandleRunCode()
   }, [code])
 
   return (
@@ -156,10 +109,7 @@ export const OutputBlock: React.FC<OutputBlockProps> = ({
       <pre className={styles.outputContent}>
         {output.map((item, index) => (
           <div className={styles.outputWrapper} key={item.id}>
-            <div
-              key={item.id}
-              className={cn(styles.outputItem, styles[item.type])}
-            >
+            <div className={cn(styles.outputItem, styles[item.type])}>
               {item.component}
             </div>
             {index !== output.length - 1 && (
