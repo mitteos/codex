@@ -3,19 +3,22 @@ import { OutputState } from '../../types'
 import styles from './OutputBlock.module.scss'
 import cn from 'classnames'
 import { useEffect, useRef, useState } from 'react'
+import * as ts from 'typescript'
 
 interface OutputBlockProps {
   outRef: React.RefObject<HTMLDivElement>
   startResizing: () => void
   stopResizing: () => void
   code: string
+  language?: string
 }
 
 export const OutputBlock: React.FC<OutputBlockProps> = ({
   outRef,
   startResizing,
   stopResizing,
-  code
+  code,
+  language
 }) => {
   const idCounterRef = useRef(0)
   const [output, setOutput] = useState<OutputState[]>([])
@@ -98,14 +101,38 @@ export const OutputBlock: React.FC<OutputBlockProps> = ({
     }
 
     try {
-      const func = new Function('console', code)
+      let jsCode = code
+
+      if (language === 'typescript') {
+        try {
+          jsCode = ts.transpileModule(code, {
+            compilerOptions: {
+              target: ts.ScriptTarget.ES2015,
+              module: ts.ModuleKind.None
+            }
+          }).outputText
+        } catch (transpileError: any) {
+          logs.push({
+            id: generateUniqueId(),
+            type: 'error',
+            component: (
+              <p key={generateUniqueId()}>
+                🚫 TypeScript Error: {transpileError.message}
+              </p>
+            )
+          })
+          return logs
+        }
+      }
+
+      const func = new Function('console', jsCode)
       func(fakeConsole)
     } catch (err: any) {
       logs.push({
         id: generateUniqueId(),
         type: 'error',
         component: (
-          <p key={generateUniqueId()}>🚫 Compilation error: {err.message}</p>
+          <p key={generateUniqueId()}>🚫 Runtime error: {err.message}</p>
         )
       })
     }

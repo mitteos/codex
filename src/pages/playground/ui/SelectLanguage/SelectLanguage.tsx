@@ -46,7 +46,7 @@ export const SelectLanguage = ({ className }: SelectLanguageProps) => {
           viewBox="0 0 18 11"
           fill="none"
         >
-          <path d="M1 1L9 9L17 1" stroke="#eee" stroke-width="2" />
+          <path d="M1 1L9 9L17 1" stroke="#eee" strokeWidth="2" />
         </svg>
       </div>
       <div

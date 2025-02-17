@@ -152,6 +152,7 @@ export const PlaygroundPage = () => {
         startResizing={startResizing}
         stopResizing={stopResizing}
         code={editorRef.current?.getModel()?.getValue() || ''}
+        language={language}
       />
       <AuthModal isOpen={isAuthModalOpen} />
     </div>
