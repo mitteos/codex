@@ -1,4 +1,5 @@
 import { Editor } from '@monaco-editor/react'
+import * as monaco from 'monaco-editor'
 import styles from './PlaygroundPage.module.scss'
 import { useEffect, useRef, useState } from 'react'
 import { OutputBlock } from './OutputBlock/OutputBlock'
@@ -15,6 +16,7 @@ import { setUserColor } from '../helpers/setUserColor'
 import useSocketStore from '@/shared/store/useSocketStore'
 import { useResizablePanels } from '@/shared/helpers/useResizablePanels'
 import { getUserColor } from '../helpers/getUserColor'
+import useLanguageStore from '../store/useLanguageStore'
 
 export const PlaygroundPage = () => {
   const editorBlockRef = useRef<HTMLDivElement>(null)
@@ -25,6 +27,8 @@ export const PlaygroundPage = () => {
   const { setSocket } = useSocketStore()
   const [usersList, setUsersList] = useState<UserState[]>([])
   const { id: roomId } = useParams()
+  const { language, setLanguage } = useLanguageStore()
+  const [yDoc, setYDoc] = useState<Y.Doc | null>(null)
 
   const { startResizing, stopResizing } = useResizablePanels(
     editorBlockRef,
@@ -39,16 +43,51 @@ export const PlaygroundPage = () => {
     setIsAuthModalOpen(false)
   }, [name])
 
+  useEffect(() => {
+    if (yDoc && language) {
+      const sharedLanguage = yDoc.getMap('language')
+      sharedLanguage.set('current', language)
+    }
+  }, [language, yDoc])
+
+  useEffect(() => {
+    return () => {
+      if (yDoc) {
+        yDoc.destroy()
+      }
+    }
+  }, [yDoc])
+
   const handleMount = (editor: any) => {
     editorRef.current = editor
 
     const doc = new Y.Doc()
+    setYDoc(doc)
+
     const provider = new WebsocketProvider(
       `wss://codex-server-yjs.onrender.com/${roomId}`,
       `playground-${roomId}`,
       doc
     )
     setSocket(provider)
+
+    const sharedLanguage = doc.getMap('language')
+
+    if (!sharedLanguage.get('current')) {
+      sharedLanguage.set('current', language)
+    } else {
+      setLanguage(sharedLanguage.get('current') as string)
+    }
+
+    sharedLanguage.observe(() => {
+      const newLanguage = sharedLanguage.get('current')
+      setLanguage(newLanguage as string)
+
+      if (editorRef.current) {
+        const model = editorRef.current.getModel()
+        monaco.editor.setModelLanguage(model, newLanguage as string)
+      }
+    })
 
     const type = doc.getText('monaco')
     const awareness = provider.awareness
@@ -102,7 +141,7 @@ export const PlaygroundPage = () => {
           <Editor
             className={styles.editor}
             height="100vh"
-            defaultLanguage="javascript"
+            defaultLanguage={language}
             theme="vs-dark"
             onMount={handleMount}
           />

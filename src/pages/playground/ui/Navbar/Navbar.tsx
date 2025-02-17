@@ -3,7 +3,7 @@ import styles from './Navbar.module.scss'
 import { Link, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { UserState } from '../../types'
-import useLanguageStore from '../../store/useLanguageStore'
+import { SelectLanguage } from '../SelectLanguage/SelectLanguage'
 
 interface NavbarProps {
   usersList: UserState[]
@@ -13,7 +13,6 @@ export const Navbar = ({ usersList }: NavbarProps) => {
   const location = useLocation()
   const fullUrl = `${window.location.origin}${location.pathname}${location.search}${location.hash}`
   const [link] = useState(fullUrl)
-  const { language, setLanguage } = useLanguageStore()
 
   const handleCopy = () => {
     navigator.clipboard.writeText(fullUrl)
@@ -37,14 +36,7 @@ export const Navbar = ({ usersList }: NavbarProps) => {
           <Link to="/" className={styles.logo}>
             <img className={styles.logoImage} src="/logo.png" alt="codeX" />
           </Link>
-          <select
-            className={styles.languageSelect}
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-          >
-            <option value="javascript">JavaScript</option>
-            <option value="typescript">TypeScript</option>
-          </select>
+          <SelectLanguage />
         </div>
         <div className={styles.controls}>
           <div className={styles.user}>
