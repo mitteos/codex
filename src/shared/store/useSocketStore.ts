@@ -3,7 +3,7 @@ import { create } from 'zustand'
 
 interface SocketStore {
   socket: WebsocketProvider | null
-  setSocket: (socket: WebsocketProvider) => void
+  setSocket: (socket: WebsocketProvider | null) => void
   disconnect: () => void
 }
 
