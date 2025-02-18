@@ -26,6 +26,32 @@ export const OutputBlock: React.FC<OutputBlockProps> = ({
     return idCounterRef.current
   }
 
+  const serializeValue = (value: any): string => {
+    if (value instanceof Map) {
+      return (
+        'new Map(' +
+        Array.from(value.entries())
+          .map(
+            ([key, val]) => `[${JSON.stringify(key)}, ${serializeValue(val)}]`
+          )
+          .join(', ') +
+        ')'
+      )
+    } else if (value instanceof Set) {
+      return (
+        'new Set(' +
+        Array.from(value)
+          .map((item) => serializeValue(item))
+          .join(', ') +
+        ')'
+      )
+    } else if (value instanceof Promise) {
+      return 'Promise { <pending> }'
+    } else {
+      return JSON.stringify(value, null, 2)
+    }
+  }
+
   const safeEval = (code: any) => {
     try {
       const originalLog = console.log
@@ -39,25 +65,25 @@ export const OutputBlock: React.FC<OutputBlockProps> = ({
         logs.push({
           id: generateId(),
           type: 'log' as const,
-          component: args.map((arg) => JSON.stringify(arg, null, 2)).join(' ')
+          component: args.map((arg) => serializeValue(arg)).join(' ')
         })
       console.error = (...args) =>
         logs.push({
           id: generateId(),
           type: 'error' as const,
-          component: args.map((arg) => JSON.stringify(arg, null, 2)).join(' ')
+          component: args.map((arg) => serializeValue(arg)).join(' ')
         })
       console.warn = (...args) =>
         logs.push({
           id: generateId(),
           type: 'warn' as const,
-          component: args.map((arg) => JSON.stringify(arg, null, 2)).join(' ')
+          component: args.map((arg) => serializeValue(arg)).join(' ')
         })
       console.info = (...args) =>
         logs.push({
           id: generateId(),
           type: 'info' as const,
-          component: args.map((arg) => JSON.stringify(arg, null, 2)).join(' ')
+          component: args.map((arg) => serializeValue(arg)).join(' ')
         })
       try {
         eval(code)
