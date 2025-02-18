@@ -3,6 +3,7 @@ import { OutputState } from '../../types'
 import styles from './OutputBlock.module.scss'
 import cn from 'classnames'
 import { useEffect, useRef, useState } from 'react'
+import { useTranspile } from '@/shared/helpers/useTranspile'
 
 interface OutputBlockProps {
   outRef: React.RefObject<HTMLDivElement>
@@ -16,7 +17,8 @@ export const OutputBlock: React.FC<OutputBlockProps> = ({
   outRef,
   startResizing,
   stopResizing,
-  code
+  code,
+  language
 }) => {
   const [output, setOutput] = useState<OutputState[]>([])
   const idCounterRef = useRef(0)
@@ -86,7 +88,9 @@ export const OutputBlock: React.FC<OutputBlockProps> = ({
           component: args.map((arg) => serializeValue(arg)).join(' ')
         })
       try {
-        eval(code)
+        const processedCode =
+          language === 'typescript' ? useTranspile(code) : code
+        eval(processedCode)
       } catch (e: any) {
         logs.push({
           id: generateId(),
@@ -121,7 +125,7 @@ export const OutputBlock: React.FC<OutputBlockProps> = ({
 
   useEffect(() => {
     debouncedHandleRunCode()
-  }, [code])
+  }, [code, language])
 
   return (
     <div className={styles.output} ref={outRef}>
