@@ -55,42 +55,47 @@ export const OutputBlock: React.FC<OutputBlockProps> = ({
   }
 
   const safeEval = (code: any) => {
-    try {
-      const originalLog = console.log
-      const originalError = console.error
-      const originalWarn = console.warn
-      const originalInfo = console.info
+    const originalLog = console.log
+    const originalError = console.error
+    const originalWarn = console.warn
+    const originalInfo = console.info
 
+    try {
       const logs: OutputState[] = []
 
-      console.log = (...args) =>
-        logs.push({
-          id: generateId(),
-          type: 'log' as const,
-          component: args.map((arg) => serializeValue(arg)).join(' ')
-        })
-      console.error = (...args) =>
-        logs.push({
-          id: generateId(),
-          type: 'error' as const,
-          component: args.map((arg) => serializeValue(arg)).join(' ')
-        })
-      console.warn = (...args) =>
-        logs.push({
-          id: generateId(),
-          type: 'warn' as const,
-          component: args.map((arg) => serializeValue(arg)).join(' ')
-        })
-      console.info = (...args) =>
-        logs.push({
-          id: generateId(),
-          type: 'info' as const,
-          component: args.map((arg) => serializeValue(arg)).join(' ')
-        })
+      const fakeConsole = {
+        log: (...args: any[]) =>
+          logs.push({
+            id: generateId(),
+            type: 'log' as const,
+            component: args.map((arg) => serializeValue(arg)).join(' ')
+          }),
+        error: (...args: any[]) =>
+          logs.push({
+            id: generateId(),
+            type: 'error' as const,
+            component: args.map((arg) => serializeValue(arg)).join(' ')
+          }),
+        warn: (...args: any[]) =>
+          logs.push({
+            id: generateId(),
+            type: 'warn' as const,
+            component: args.map((arg) => serializeValue(arg)).join(' ')
+          }),
+        info: (...args: any[]) =>
+          logs.push({
+            id: generateId(),
+            type: 'info' as const,
+            component: args.map((arg) => serializeValue(arg)).join(' ')
+          })
+      }
+
       try {
         const processedCode =
           language === 'typescript' ? useTranspile(code) : code
-        eval(processedCode)
+
+        const func = new Function('console', processedCode)
+        func(fakeConsole)
       } catch (e: any) {
         logs.push({
           id: generateId(),
@@ -98,11 +103,6 @@ export const OutputBlock: React.FC<OutputBlockProps> = ({
           component: e.message
         })
       }
-
-      console.log = originalLog
-      console.error = originalError
-      console.warn = originalWarn
-      console.info = originalInfo
 
       return logs
     } catch (error: any) {
@@ -113,6 +113,11 @@ export const OutputBlock: React.FC<OutputBlockProps> = ({
           component: error.message
         }
       ]
+    } finally {
+      console.log = originalLog
+      console.error = originalError
+      console.warn = originalWarn
+      console.info = originalInfo
     }
   }
 
@@ -121,7 +126,7 @@ export const OutputBlock: React.FC<OutputBlockProps> = ({
     setOutput(logs)
   }
 
-  const debouncedHandleRunCode = useDebounce(handleRunCode, 1000)
+  const debouncedHandleRunCode = useDebounce(handleRunCode, 500)
 
   useEffect(() => {
     debouncedHandleRunCode()
